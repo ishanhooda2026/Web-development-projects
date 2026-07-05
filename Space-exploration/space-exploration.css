@@ -1,0 +1,293 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #07070c;  
+  color: #f2eee6;               
+  font-family: "Public Sans", Arial, sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.mono {
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 1px;
+}
+
+.spectral-scale {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(to right, #9bb0ff, #f2eee6, #e8b054, #c8477a);
+}
+
+/* ---------- header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  background-color: #07070c;
+  border-bottom: 1px solid #241f33;
+  padding: 18px 32px;
+  z-index: 10;
+}
+
+.header-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.wordmark {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #f2eee6;
+  text-decoration: none;
+}
+
+.catalog-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.catalog-nav a {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  color: #8f8a9c;
+  text-decoration: none;
+}
+
+.catalog-nav a:hover {
+  color: #e8b054;
+}
+
+/* ---------- hero section ---------- */
+.hero {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 90px 32px 70px 32px;
+  background-color: #0b0a12; 
+}
+
+.eyebrow {
+  color: #c8477a;
+  font-size: 12px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.hero-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 48px;
+  line-height: 1.15;
+  max-width: 600px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: #e8b054;
+}
+
+.hero-sub {
+  margin-top: 24px;
+  max-width: 560px;
+  font-size: 17px;
+  color: #8f8a9c;
+}
+
+.hero-stats {
+  margin-top: 56px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  border-top: 1px solid #241f33;
+  padding-top: 28px;
+}
+
+.stat {
+  flex: 1;
+  min-width: 220px;
+}
+
+.stat-num {
+  display: block;
+  font-size: 26px;
+  font-weight: 600;
+  color: #7fb2d4;
+  margin-bottom: 10px;
+}
+
+.stat-num small {
+  font-size: 14px;
+  color: #8f8a9c;
+  margin-left: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #5e5a6c;
+  line-height: 1.5;
+}
+
+.scroll-cue {
+  margin-top: 48px;
+  font-size: 12px;
+  color: #5e5a6c;
+}
+
+/* ---------- catalog entries ---------- */
+.entry {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 90px 32px;
+}
+
+.entry-dark {
+  max-width: 100%;
+  background-color: #100d1c;
+  border-top: 1px solid #241f33;
+  border-bottom: 1px solid #241f33;
+}
+
+.entry-dark .entry-tag,
+.entry-dark .entry-title,
+.entry-dark .entry-lede,
+.entry-dark .fact-grid {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* the little "specimen tag" box on each section */
+.entry-tag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 12px;
+  color: #8f8a9c;
+  border: 1px solid #4a372c;
+  border-left: 4px solid #e8b054;
+  padding: 10px 16px;
+  margin-bottom: 32px;
+  width: fit-content;
+}
+
+.entry-tag span:first-child {
+  color: #e8b054;
+}
+
+.entry-tag span:nth-child(2) {
+  color: #7fb2d4;
+}
+
+.entry-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1.2;
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+
+.entry-lede {
+  max-width: 620px;
+  color: #8f8a9c;
+  font-size: 16px;
+  margin-bottom: 48px;
+}
+
+.fact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.fact {
+  background-color: #0b0a12;
+  border: 1px solid #241f33;
+  padding: 32px;
+}
+
+.entry-dark .fact {
+  background-color: #14111f;
+}
+
+.fact h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 19px;
+  margin-bottom: 14px;
+  color: #f2eee6;
+}
+
+.fact p {
+  font-size: 15px;
+  color: #8f8a9c;
+}
+
+.fact p strong {
+  color: #e8b054;
+  font-weight: 500;
+}
+
+.fact p em {
+  color: #7fb2d4;
+  font-style: normal;
+}
+
+/* ---------- footer ---------- */
+.site-footer {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 60px 32px 90px 32px;
+  border-top: 1px solid #241f33;
+  color: #5e5a6c;
+}
+
+.site-footer .mono {
+  font-size: 12px;
+  color: #8f8a9c;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.footer-note {
+  font-size: 14px;
+  max-width: 500px;
+}
+
+/* ---------- responsive: stack everything on small screens ---------- */
+@media (max-width: 860px) {
+  .catalog-nav {
+    display: none;
+  }
+
+  .fact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 34px;
+  }
+
+  .entry {
+    padding: 60px 24px;
+  }
+
+  .hero {
+    padding: 60px 24px;
+  }
+}
