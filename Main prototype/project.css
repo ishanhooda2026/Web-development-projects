@@ -1,0 +1,41 @@
+.back-link {
+  display: block; padding: 0 10px 18px; color: var(--text-muted); font-size: 13px; font-weight: 500;
+  transition: color .2s;
+}
+.back-link:hover { color: var(--accent-cyan); }
+
+.proj-section { animation: stepIn .35s var(--ease-out); }
+
+/* Attendance table */
+.att-row {
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; align-items: center; gap: 10px;
+  padding: 13px 14px; border-radius: 12px; background: var(--bg-elevated); margin-bottom: 8px;
+  cursor: pointer; transition: transform .2s;
+}
+.att-row:hover { transform: translateX(3px); border-color: var(--accent-blue); }
+.att-row.head { background: transparent; font-size: 12px; color: var(--text-muted); cursor: default; text-transform: uppercase; letter-spacing: .03em; padding: 0 14px 8px; }
+.att-row.head:hover { transform: none; }
+.att-who { display: flex; align-items: center; gap: 10px; }
+.arrival-edit { display: flex; align-items: center; gap: 6px; }
+.arrival-edit input[type="time"] {
+  background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px;
+  color: var(--text-primary); padding: 6px 8px; font-size: 13px; width: 105px;
+}
+
+/* Task board */
+.task-board-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 12px; background: var(--bg-elevated); margin-bottom: 8px; }
+.task-board-row .who { font-weight: 600; font-size: 14px; }
+.task-board-row .task-title { font-size: 13.5px; color: var(--text-secondary); margin-top: 2px; }
+
+/* Blueprint grid */
+.blueprint-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 14px; margin-top: 18px; }
+.blueprint-item { background: var(--bg-elevated); border-radius: 14px; padding: 12px; text-align: center; position: relative; }
+.blueprint-item img { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+.blueprint-item .pdf-icon { width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 34px; background: var(--bg-card); border-radius: 10px; margin-bottom: 8px; }
+.blueprint-item .name { font-size: 12px; word-break: break-word; color: var(--text-secondary); }
+.blueprint-item .remove-x { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,0.5); font-size: 12px; }
+
+@media (max-width: 700px) {
+  .att-row, .att-row.head { grid-template-columns: 1.4fr 1fr; }
+  .att-row .col-late, .att-row .col-arrival { display: none; }
+}

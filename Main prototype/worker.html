@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My BuildSync</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="worker.css">
+</head>
+<body>
+<div class="bg-ambient"></div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">B</span>BuildSync</div>
+    <div class="side-role">Labour</div>
+    <nav class="side-nav" id="sectionNav">
+      <a class="side-link active" data-section="attendance" href="#"><span>✅</span> Attendance</a>
+      <a class="side-link" data-section="details" href="#"><span>💰</span> Details</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip" id="userChip"></div>
+      <button class="btn btn-ghost btn-block" onclick="logout()">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main worker-main">
+
+    <div id="noProjectState" class="card empty-state hidden" style="padding:60px 20px">
+      <div class="glyph">🕓</div>
+      You haven't been assigned to a project yet. Ask your supervisor to assign one.
+    </div>
+
+    <div id="pageContent">
+      <div class="main-head">
+        <div>
+          <h1 id="greetName">Hey there</h1>
+          <div class="sub" id="todayDate"></div>
+        </div>
+      </div>
+
+      <!-- ============ ATTENDANCE SECTION ============ -->
+      <section class="worker-section" data-section-panel="attendance">
+
+        <!-- Today's status (shown once verified) -->
+        <div class="card status-card hidden" id="todayStatusCard">
+          <div class="status-icon" id="statusIcon">✓</div>
+          <div>
+            <div class="status-title" id="statusTitle">You're marked present today</div>
+            <div class="status-sub text-muted" id="statusSub"></div>
+          </div>
+        </div>
+
+        <!-- Verification checklist (shown until all 3 steps done) -->
+        <div class="card panel" id="checklistPanel">
+          <div class="panel-head"><h3>Mark today's attendance</h3></div>
+
+          <div class="check-item">
+            <div class="left">
+              <span class="check-tick" id="tickLoc">📍</span>
+              <div><div class="ci-title">Turn on Location</div><div class="ci-sub text-muted" id="locSub">Confirm you're on site</div></div>
+            </div>
+            <button class="btn btn-ghost" id="locBtn">Turn On</button>
+          </div>
+
+          <div class="check-item">
+            <div class="left">
+              <span class="check-tick" id="tickSelfie">🤳</span>
+              <div><div class="ci-title">Selfie Verification</div><div class="ci-sub text-muted" id="selfieSub">Look at the camera</div></div>
+            </div>
+            <button class="btn btn-ghost" id="selfieBtn">Open Camera</button>
+          </div>
+          <div class="camera-box hidden" id="selfieBox">
+            <video id="selfieVideo" autoplay playsinline muted></video>
+            <img id="selfiePreview" class="hidden">
+          </div>
+
+          <div class="check-item">
+            <div class="left">
+              <span class="check-tick" id="tickQr">▦</span>
+              <div><div class="ci-title">QR Scanner</div><div class="ci-sub text-muted" id="qrSub">Scan the code at site entrance</div></div>
+            </div>
+            <button class="btn btn-ghost" id="qrBtn">Open Scanner</button>
+          </div>
+          <div class="camera-box hidden" id="qrBox">
+            <video id="qrVideo" autoplay playsinline muted></video>
+            <div class="scan-frame"></div>
+          </div>
+          <button class="btn-text" id="skipQrBtn">Can't scan? Tap here to check in manually</button>
+        </div>
+
+        <!-- Calendar (always visible) -->
+        <div class="card panel">
+          <div class="panel-head">
+            <h3 id="calMonthLabel">Month</h3>
+            <div style="display:flex;gap:8px">
+              <button class="btn-text" id="prevMonthBtn">‹ Prev</button>
+              <button class="btn-text" id="nextMonthBtn">Next ›</button>
+            </div>
+          </div>
+          <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
+            <div class="card mini-stat" style="padding:14px"><div class="label">Present</div><div class="value good" id="statPresent">0</div></div>
+            <div class="card mini-stat" style="padding:14px"><div class="label">Late</div><div class="value warn" id="statLate">0</div></div>
+            <div class="card mini-stat" style="padding:14px"><div class="label">Absent</div><div class="value" style="color:var(--danger)" id="statAbsent">0</div></div>
+          </div>
+          <div class="cal-dow">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <span><i class="dot present"></i> Present</span>
+            <span><i class="dot late"></i> Late</span>
+            <span><i class="dot absent"></i> Absent</span>
+            <span><i class="dot future"></i> Upcoming</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DETAILS SECTION ============ -->
+      <section class="worker-section hidden" data-section-panel="details">
+        <div class="card mini-stat" style="padding:20px;margin-bottom:22px">
+          <div class="label">Days Worked (all-time)</div><div class="value" id="statAllTime">0</div>
+        </div>
+
+        <div class="card panel">
+          <div class="panel-head"><h3>💰 Wage Calculator</h3></div>
+          <div class="wage-row"><span>Days worked (all-time)</span><strong id="wDays">0</strong></div>
+          <div class="wage-row"><span>Daily wage</span><strong id="wRate">₹0</strong></div>
+          <div class="wage-row"><span>Total earned</span><strong id="wGross">₹0</strong></div>
+          <div class="wage-row"><span>Already paid</span><strong id="wPaid">₹0</strong></div>
+          <div class="wage-row balance"><span>Balance due to you</span><strong id="wBalance">₹0</strong></div>
+          <p class="text-muted" style="font-size:12px;margin-top:10px">Your supervisor updates payments — this always shows what's still owed.</p>
+        </div>
+
+        <div class="card panel" id="tasksPanel">
+          <div class="panel-head"><h3>📋 Today's Work</h3></div>
+          <div id="tasksList"></div>
+        </div>
+
+        <div class="card panel">
+          <div class="panel-head"><h3>My Project</h3></div>
+          <div id="projectInfo"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="dashboard-common.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"></script>
+<script src="worker.js"></script>
+</body>
+</html>

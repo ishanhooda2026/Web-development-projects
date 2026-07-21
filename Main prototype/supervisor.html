@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supervisor Dashboard — BuildSync AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="supervisor.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+<div class="bg-ambient"></div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">B</span>BuildSync</div>
+    <div class="side-role">Supervisor</div>
+    <nav class="side-nav">
+      <a class="side-link" data-section="overview" href="#"><span>📊</span> Overview</a>
+      <a class="side-link" data-section="labour" href="#"><span>👷</span> Labour</a>
+      <a class="side-link" data-section="progress" href="#"><span>📈</span> Progress</a>
+      <a class="side-link" data-section="log" href="#"><span>📸</span> Daily Log</a>
+      <a class="side-link" data-section="alerts" href="#"><span>⚠️</span> Alerts</a>
+      <a class="side-link" data-section="blueprints" href="#"><span>📐</span> Blueprints</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip" id="userChip"></div>
+      <button class="btn btn-ghost btn-block" onclick="logout()">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <div>
+        <h1 id="pageTitle">My Site</h1>
+        <div class="sub" id="todayDate"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" id="setSiteLocBtn">📍 Set Site Location</button>
+        <button class="btn btn-primary fab" onclick="openModal('newWorkerModal')">+ Add Labour</button>
+      </div>
+    </div>
+
+    <div id="noProjectState" class="card empty-state hidden" style="padding:60px 20px">
+      <div class="glyph">🕓</div>
+      You haven't been assigned to a project yet. Ask your builder to assign one.
+    </div>
+
+    <div id="dashboardContent">
+
+      <!-- OVERVIEW -->
+      <section class="dash-section" id="section-overview">
+        <div class="stat-cards">
+          <div class="card mini-stat"><div class="label">Present Today</div><div class="value good" id="statPresent">0</div></div>
+          <div class="card mini-stat"><div class="label">Late Today</div><div class="value warn" id="statLate">0</div></div>
+          <div class="card mini-stat"><div class="label">Absent Today</div><div class="value" style="color:var(--danger)" id="statAbsent">0</div></div>
+          <div class="card mini-stat"><div class="label">Total Labour</div><div class="value" id="statWorkers">0</div></div>
+        </div>
+
+        <div class="card panel" id="attendance-panel">
+          <div class="panel-head"><h3>Today's Check-ins</h3></div>
+          <div id="attendanceList"></div>
+        </div>
+      </section>
+
+      <!-- LABOUR -->
+      <section class="dash-section" id="section-labour">
+        <div class="card panel" id="workers-panel">
+          <div class="panel-head">
+            <h3>Labour</h3>
+            <button class="btn-text" onclick="openModal('newWorkerModal')">+ Add</button>
+          </div>
+          <div id="workersList"></div>
+        </div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section class="dash-section" id="section-progress">
+        <div class="card panel" id="progress-panel">
+          <div class="panel-head"><h3>📈 Work Progress</h3></div>
+          <div id="progressSliders"></div>
+        </div>
+      </section>
+
+      <!-- DAILY LOG -->
+      <section class="dash-section" id="section-log">
+        <div class="card panel" id="log-panel">
+          <div class="panel-head"><h3>📸 Today's Site Log</h3></div>
+          <form id="dailyLogForm" class="auth-form">
+            <label class="field-label">Upload progress photos</label>
+            <input type="file" id="logPhotos" accept="image/*" multiple class="text-input">
+            <div id="photoPreview" class="photo-preview"></div>
+            <label class="field-label">Feedback on today's work</label>
+            <textarea id="logFeedback" class="text-input" rows="3" placeholder="e.g. Brick work on the east wall completed, plaster team starts tomorrow…"></textarea>
+            <button type="submit" class="btn btn-primary btn-block">Post Update</button>
+          </form>
+          <div class="panel-head" style="margin-top:22px"><h3>History</h3></div>
+          <div id="logHistory"></div>
+        </div>
+      </section>
+
+      <!-- ALERTS -->
+      <section class="dash-section" id="section-alerts">
+        <div class="card panel" id="alerts-panel">
+          <div class="panel-head"><h3>⚠️ Alerts</h3></div>
+          <div id="alertsList"></div>
+        </div>
+      </section>
+
+      <!-- BLUEPRINTS & SITE PLANS -->
+      <section class="dash-section" id="section-blueprints">
+        <div class="card panel" id="blueprints-panel">
+          <div class="panel-head"><h3>📐 Blueprints &amp; Site Plans</h3></div>
+          <form id="blueprintForm" class="auth-form">
+            <label class="field-label">Upload a blueprint or site plan (image or PDF)</label>
+            <input type="file" id="blueprintFile" accept="image/*,.pdf" class="text-input">
+            <label class="field-label">Label</label>
+            <input class="text-input" id="blueprintName" placeholder="e.g. Ground Floor Plan">
+            <button type="submit" class="btn btn-primary btn-block">Upload</button>
+          </form>
+          <div class="panel-head" style="margin-top:22px"><h3>Uploaded Plans</h3></div>
+          <div id="blueprintsList"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- New Worker Modal -->
+<div class="modal-overlay" id="newWorkerModal">
+  <div class="modal">
+    <h3>Add Labour</h3>
+    <form id="newWorkerForm" class="auth-form">
+      <label class="field-label">Name</label>
+      <input class="text-input" id="workerName" placeholder="e.g. Ramesh Kumar" required>
+      <label class="field-label">Phone number</label>
+      <div class="phone-input"><span class="phone-prefix">+91</span><input id="workerPhone" maxlength="10" inputmode="numeric" placeholder="98765 43210" required></div>
+      <label class="field-label">Trade</label>
+      <input class="text-input" id="workerTrade" placeholder="e.g. Mason, Electrician, Helper">
+      <label class="field-label">Project</label>
+      <select class="text-input" id="workerProject" required></select>
+      <label class="field-label">Daily wage (₹)</label>
+      <input class="text-input" id="workerWage" type="number" placeholder="700" value="700">
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="button" class="btn btn-ghost btn-block" onclick="closeModal('newWorkerModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block">Add Labour</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Worker Detail / Manage Modal -->
+<div class="modal-overlay" id="workerDetailModal">
+  <div class="modal" id="workerDetailBody"></div>
+</div>
+
+<!-- Worker Attendance Calendar Modal -->
+<div class="modal-overlay" id="workerCalendarModal">
+  <div class="modal" id="workerCalendarBody"></div>
+</div>
+
+<!-- Attendance location modal (shared with builder's project page) -->
+<div class="modal-overlay" id="attendanceLocationModal">
+  <div class="modal" style="max-width:480px">
+    <div id="attendanceLocationBody"></div>
+  </div>
+</div>
+
+<!-- Set Site Location Modal -->
+<div class="modal-overlay" id="siteLocationModal">
+  <div class="modal">
+    <h3>📍 Set Site Location</h3>
+
+    <div id="locStepChoice">
+      <p class="text-secondary" style="margin-bottom:18px">Set the site's location so worker check-ins can be geofenced.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button type="button" class="btn btn-primary btn-block" id="locUseCurrentBtn">📍 Use My Current Location</button>
+        <button type="button" class="btn btn-ghost btn-block" id="locOpenMapBtn">🗺️ Open Map to Choose Location</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" onclick="closeModal('siteLocationModal')">Cancel</button>
+    </div>
+
+    <div id="locStepMap" class="hidden">
+      <p class="text-secondary" style="margin-bottom:10px" id="locMapHint">Click anywhere on the map to place the site pin. Drag the pin to fine-tune.</p>
+      <div id="siteMap"></div>
+      <label class="field-label">Geofence radius (metres)</label>
+      <input class="text-input" type="number" id="geofenceRadiusInput" min="30" max="5000" step="10">
+      <p class="text-muted" style="font-size:12.5px;margin-top:6px">Workers get an alert if they check in or move outside this radius from the pin. Set it to match this site's actual size — a small plot might need 50–100m, a large site could need 500m+.</p>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button type="button" class="btn btn-ghost btn-block" id="locBackBtn">Back</button>
+        <button type="button" class="btn btn-primary btn-block" id="locSaveBtn">Save Site Location</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Task Modal -->
+<div class="modal-overlay" id="assignTaskModal">
+  <div class="modal">
+    <h3>Assign Today's Work</h3>
+    <form id="assignTaskForm" class="auth-form">
+      <input type="hidden" id="taskWorkerId">
+      <p class="text-secondary" id="taskWorkerName" style="margin-top:-8px"></p>
+      <label class="field-label">Task</label>
+      <input class="text-input" id="taskTitle" placeholder="e.g. Plaster east wall, 2nd floor" required>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="button" class="btn btn-ghost btn-block" onclick="closeModal('assignTaskModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block">Assign</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="dashboard-common.js"></script>
+<script src="supervisor.js"></script>
+</body>
+</html>

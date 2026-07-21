@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builder Dashboard — BuildSync AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div class="bg-ambient"></div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">B</span>BuildSync</div>
+    <div class="side-role">Builder</div>
+    <nav class="side-nav">
+      <a class="side-link active" href="#"><span>📊</span> Overview</a>
+      <a class="side-link" href="#projects-panel"><span>🏗️</span> Projects</a>
+      <a class="side-link" href="#supervisors-panel"><span>👷</span> Supervisors</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip" id="userChip"></div>
+      <button class="btn btn-ghost btn-block" onclick="logout()">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <div>
+        <h1>Good morning<span id="builderFirstName"></span></h1>
+        <div class="sub" id="todayDate"></div>
+      </div>
+      <button class="btn btn-primary fab" onclick="openModal('newProjectModal')">+ New Project</button>
+    </div>
+
+    <div class="stat-cards">
+      <div class="card mini-stat"><div class="label">Active Projects</div><div class="value" id="statProjects">0</div></div>
+      <div class="card mini-stat"><div class="label">Supervisors</div><div class="value" id="statSupervisors">0</div></div>
+      <div class="card mini-stat"><div class="label">Total Workers</div><div class="value" id="statWorkers">0</div></div>
+      <div class="card mini-stat"><div class="label">Present Today</div><div class="value good" id="statPresent">0</div></div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="card panel" id="projects-panel">
+          <div class="panel-head">
+            <h3>Your Projects</h3>
+            <button class="btn-text" onclick="openModal('newProjectModal')">+ Add</button>
+          </div>
+          <div id="projectsList"></div>
+        </div>
+
+        <div class="card panel" id="supervisors-panel">
+          <div class="panel-head">
+            <h3>Supervisors</h3>
+          </div>
+          <div id="supervisorsList"></div>
+          <p class="text-muted" style="font-size:12.5px;margin-top:4px">Open a project to assign a supervisor to it.</p>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div class="panel-head"><h3>⚠️ Alerts</h3></div>
+        <div id="alertsList"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- New Project Modal -->
+<div class="modal-overlay" id="newProjectModal">
+  <div class="modal">
+    <h3>New Project</h3>
+    <form id="newProjectForm" class="auth-form">
+      <label class="field-label">Project name</label>
+      <input class="text-input" id="projName" placeholder="e.g. Skyline Residency" required>
+      <label class="field-label">Location</label>
+      <input class="text-input" id="projLocation" placeholder="e.g. Sector 12, Gurugram" required>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="button" class="btn btn-ghost btn-block" onclick="closeModal('newProjectModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="dashboard-common.js"></script>
+<script src="builder.js"></script>
+</body>
+</html>

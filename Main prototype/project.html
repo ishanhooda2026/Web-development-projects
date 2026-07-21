@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project — BuildSync AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="supervisor.css">
+<link rel="stylesheet" href="worker.css">
+<link rel="stylesheet" href="project.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+<div class="bg-ambient"></div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">B</span>BuildSync</div>
+    <a href="builder.html" class="back-link">‹ Back to Dashboard</a>
+    <div class="side-role" id="projectNameTag">Project</div>
+    <nav class="side-nav" id="sectionNav">
+      <a class="side-link active" data-section="overview" href="#"><span>📊</span> Overview</a>
+      <a class="side-link" data-section="team" href="#"><span>👷</span> Team</a>
+      <a class="side-link" data-section="attendance" href="#"><span>✅</span> Attendance</a>
+      <a class="side-link" data-section="progress" href="#"><span>📈</span> Work &amp; Progress</a>
+      <a class="side-link" data-section="updates" href="#"><span>📸</span> Site Updates</a>
+      <a class="side-link" data-section="budget" href="#"><span>💰</span> Budget &amp; Wages</a>
+      <a class="side-link" data-section="blueprints" href="#"><span>📐</span> Blueprints</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip" id="userChip"></div>
+      <button class="btn btn-ghost btn-block" onclick="logout()">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div id="notFoundState" class="card empty-state hidden" style="padding:60px 20px">
+      <div class="glyph">🕓</div>Project not found.
+    </div>
+
+    <div id="projectContent">
+      <div class="main-head">
+        <div>
+          <h1 id="projTitle">Project</h1>
+          <div class="sub" id="projLocationSub"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <button class="btn btn-ghost hidden" id="setSiteLocBtn">📍 Set Site Location</button>
+          <div class="pct" id="projProgressPct" style="font-size:26px"></div>
+        </div>
+      </div>
+
+      <!-- ===== OVERVIEW ===== -->
+      <section class="proj-section" data-section-panel="overview">
+        <div class="stat-cards">
+          <div class="card mini-stat"><div class="label">Present Today</div><div class="value good" id="ovPresent">0</div></div>
+          <div class="card mini-stat"><div class="label">Late Today</div><div class="value warn" id="ovLate">0</div></div>
+          <div class="card mini-stat"><div class="label">Absent Today</div><div class="value" style="color:var(--danger)" id="ovAbsent">0</div></div>
+          <div class="card mini-stat"><div class="label">Site Progress</div><div class="value" id="ovProgress">0%</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card panel">
+            <div class="panel-head"><h3>Budget Snapshot</h3></div>
+            <div class="detail-row"><span>Total budget</span><strong id="ovBudgetTotal">₹0</strong></div>
+            <div class="detail-row"><span>Spent so far (wages paid)</span><strong id="ovBudgetSpent">₹0</strong></div>
+            <div class="detail-row"><span>Remaining</span><strong style="color:var(--success)" id="ovBudgetPending">₹0</strong></div>
+            <div class="detail-row"><span>Today's wage bill</span><strong id="ovWageBill">₹0</strong></div>
+          </div>
+          <div class="card panel">
+            <div class="panel-head"><h3>Latest Site Update</h3></div>
+            <div id="ovLatestLog"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TEAM ===== -->
+      <section class="proj-section hidden" data-section-panel="team">
+        <div class="card panel hidden" id="noSupervisorHint" style="border-color:rgba(34,211,238,0.3);background:rgba(34,211,238,0.05)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="font-size:22px">🧑‍💼</div>
+            <div>
+              <div style="font-weight:600;margin-bottom:4px">You're managing this site yourself</div>
+              <p class="text-secondary" style="font-size:13.5px">No supervisor is assigned to this project, so labour, daily updates, work progress, task assignment, and site location are all unlocked for you below — right on this page. Assign a supervisor any time to hand those off.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card panel">
+          <div class="panel-head">
+            <h3>Supervisor(s) for this project</h3>
+            <button class="btn-text" onclick="openModal('assignSupervisorModal')">+ Assign Supervisor</button>
+          </div>
+          <div id="supervisorList"></div>
+        </div>
+      </section>
+
+      <!-- ===== ATTENDANCE ===== -->
+      <section class="proj-section hidden" data-section-panel="attendance">
+        <div class="card panel">
+          <div class="panel-head">
+            <h3>Today's Attendance</h3>
+            <button class="btn-text hidden" id="addLabourBtn" onclick="openModal('newWorkerModal')">+ Add Labour</button>
+          </div>
+          <div id="attendanceTable"></div>
+        </div>
+      </section>
+
+      <!-- ===== WORK & PROGRESS ===== -->
+      <section class="proj-section hidden" data-section-panel="progress">
+        <div class="card panel">
+          <div class="panel-head"><h3>Site Progress by Category</h3></div>
+          <div id="categoryBars"></div>
+        </div>
+        <div class="card panel">
+          <div class="panel-head"><h3>Today's Assigned Work</h3></div>
+          <div id="taskBoard"></div>
+        </div>
+      </section>
+
+      <!-- ===== SITE UPDATES ===== -->
+      <section class="proj-section hidden" data-section-panel="updates">
+        <div class="card panel hidden" id="postUpdateWrap">
+          <div class="panel-head"><h3>📸 Post a Site Update</h3></div>
+          <form id="dailyLogForm" class="auth-form">
+            <label class="field-label">Upload progress photos</label>
+            <input type="file" id="logPhotos" accept="image/*" multiple class="text-input">
+            <div id="photoPreview" class="photo-preview"></div>
+            <label class="field-label">Feedback on today's work</label>
+            <textarea id="logFeedback" class="text-input" rows="3" placeholder="e.g. Brick work on the east wall completed, plaster team starts tomorrow…"></textarea>
+            <button type="submit" class="btn btn-primary btn-block">Post Update</button>
+          </form>
+        </div>
+        <div class="card panel">
+          <div class="panel-head"><h3>Supervisor Updates</h3></div>
+          <div id="logHistory"></div>
+        </div>
+      </section>
+
+      <!-- ===== BUDGET & WAGES ===== -->
+      <section class="proj-section hidden" data-section-panel="budget">
+        <div class="card panel">
+          <div class="panel-head"><h3>Project Budget</h3></div>
+          <div class="inline-form">
+            <input class="text-input" type="number" id="budgetInput" placeholder="Total budget ₹">
+            <button class="btn btn-primary" id="saveBudgetBtn">Save</button>
+          </div>
+          <div class="detail-row" style="margin-top:16px"><span>Spent so far</span><strong id="budgetSpentVal">₹0</strong></div>
+          <div class="detail-row"><span>Remaining</span><strong style="color:var(--success)" id="budgetPendingVal">₹0</strong></div>
+        </div>
+        <div class="card panel">
+          <div class="panel-head"><h3>Daily Wages</h3></div>
+          <div id="wageTable"></div>
+        </div>
+      </section>
+
+      <!-- ===== BLUEPRINTS ===== -->
+      <section class="proj-section hidden" data-section-panel="blueprints">
+        <div class="card panel">
+          <div class="panel-head"><h3>Blueprints &amp; Plans</h3></div>
+          <input type="file" id="blueprintFile" accept="image/*,.pdf" class="text-input">
+          <button class="btn btn-primary" id="uploadBlueprintBtn" style="margin-top:10px">Upload</button>
+          <div id="blueprintList" class="blueprint-grid"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Assign Supervisor Modal -->
+<div class="modal-overlay" id="assignSupervisorModal">
+  <div class="modal">
+    <h3>Assign Supervisor</h3>
+    <p class="text-secondary" style="margin-top:-10px;margin-bottom:14px" id="assignSupProjectName"></p>
+    <form id="assignSupervisorForm" class="auth-form">
+      <label class="field-label">Name</label>
+      <input class="text-input" id="supName" placeholder="e.g. Vansh Singh" required>
+      <label class="field-label">Phone number</label>
+      <div class="phone-input"><span class="phone-prefix">+91</span><input id="supPhone" maxlength="10" inputmode="numeric" placeholder="98765 43210" required></div>
+      <p class="text-muted" style="font-size:12.5px">They'll sign in with this number + OTP and see only this project.</p>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="button" class="btn btn-ghost btn-block" onclick="closeModal('assignSupervisorModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block">Assign</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Labour Modal (self-managed projects only) -->
+<div class="modal-overlay" id="newWorkerModal">
+  <div class="modal">
+    <h3>Add Labour</h3>
+    <form id="newWorkerForm" class="auth-form">
+      <label class="field-label">Name</label>
+      <input class="text-input" id="workerName" placeholder="e.g. Ramesh Kumar" required>
+      <label class="field-label">Phone number</label>
+      <div class="phone-input"><span class="phone-prefix">+91</span><input id="workerPhone" maxlength="10" inputmode="numeric" placeholder="98765 43210" required></div>
+      <label class="field-label">Trade</label>
+      <input class="text-input" id="workerTrade" placeholder="e.g. Mason, Electrician, Helper">
+      <label class="field-label">Daily wage (₹)</label>
+      <input class="text-input" id="workerWage" type="number" placeholder="700" value="700">
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="button" class="btn btn-ghost btn-block" onclick="closeModal('newWorkerModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block">Add Labour</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Assign Task Modal (self-managed projects only) -->
+<div class="modal-overlay" id="assignTaskModal">
+  <div class="modal">
+    <h3>Assign Today's Work</h3>
+    <form id="assignTaskForm" class="auth-form">
+      <input type="hidden" id="taskWorkerId">
+      <p class="text-secondary" id="taskWorkerName" style="margin-top:-8px"></p>
+      <label class="field-label">Task</label>
+      <input class="text-input" id="taskTitle" placeholder="e.g. Plaster east wall, 2nd floor" required>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="button" class="btn btn-ghost btn-block" onclick="closeModal('assignTaskModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block">Assign</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Manage Worker Modal: wage rate + payments (self-managed projects only) -->
+<div class="modal-overlay" id="workerWageModal">
+  <div class="modal" id="workerWageBody"></div>
+</div>
+
+<!-- Set Site Location Modal (self-managed projects only) -->
+<div class="modal-overlay" id="siteLocationModal">
+  <div class="modal">
+    <h3>📍 Set Site Location</h3>
+
+    <div id="locStepChoice">
+      <p class="text-secondary" style="margin-bottom:18px">Set the site's location so worker check-ins can be geofenced.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button type="button" class="btn btn-primary btn-block" id="locUseCurrentBtn">📍 Use My Current Location</button>
+        <button type="button" class="btn btn-ghost btn-block" id="locOpenMapBtn">🗺️ Open Map to Choose Location</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" onclick="closeModal('siteLocationModal')">Cancel</button>
+    </div>
+
+    <div id="locStepMap" class="hidden">
+      <p class="text-secondary" style="margin-bottom:10px" id="locMapHint">Click anywhere on the map to place the site pin. Drag the pin to fine-tune.</p>
+      <div id="siteMap" style="height:280px;border-radius:14px;overflow:hidden;margin-bottom:14px"></div>
+      <label class="field-label">Geofence radius (metres)</label>
+      <input class="text-input" type="number" id="geofenceRadiusInput" min="30" max="5000" step="10">
+      <p class="text-muted" style="font-size:12.5px;margin-top:6px">Workers get an alert if they check in or move outside this radius from the pin. Set it to match this site's actual size.</p>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button type="button" class="btn btn-ghost btn-block" id="locBackBtn">Back</button>
+        <button type="button" class="btn btn-primary btn-block" id="locSaveBtn">Save Site Location</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Worker attendance calendar modal -->
+<div class="modal-overlay" id="workerCalModal">
+  <div class="modal" style="max-width:480px">
+    <div id="workerCalBody"></div>
+  </div>
+</div>
+
+<!-- Attendance location modal (shared with supervisor) -->
+<div class="modal-overlay" id="attendanceLocationModal">
+  <div class="modal" style="max-width:480px">
+    <div id="attendanceLocationBody"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="dashboard-common.js"></script>
+<script src="project.js"></script>
+</body>
+</html>

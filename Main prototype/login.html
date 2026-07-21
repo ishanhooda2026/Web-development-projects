@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — BuildSync AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="bg-ambient"></div>
+
+<a href="index.html" class="brand auth-brand"><span class="brand-mark">B</span>BuildSync</a>
+
+<main class="auth-wrap">
+  <div class="card auth-card reveal in-view">
+
+    <!-- STEP 1: phone -->
+    <div class="auth-step" id="step-phone">
+      <h2>Sign in</h2>
+      <p class="text-secondary" style="margin-top:6px">Enter your registered phone number. Builders, supervisors and labour all use the same sign-in.</p>
+      <form id="phoneForm" class="auth-form">
+        <label class="field-label">Phone number</label>
+        <div class="phone-input">
+          <span class="phone-prefix">+91</span>
+          <input type="tel" id="phoneInput" inputmode="numeric" maxlength="10" placeholder="98765 43210" autocomplete="tel" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="sendOtpBtn">Send OTP</button>
+      </form>
+      <p class="demo-hint">Demo builder to try: <strong>99999 00001</strong></p>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div class="auth-step hidden" id="step-otp">
+      <h2>Enter OTP</h2>
+      <p class="text-secondary" style="margin-top:6px">Code sent to <span id="phoneDisplay" class="text-primary" style="color:var(--text-primary);font-weight:600"></span></p>
+      <div class="demo-otp-banner" id="demoOtpBanner"></div>
+      <form id="otpForm" class="auth-form">
+        <div class="otp-boxes" id="otpBoxes">
+          <input class="otp-box" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+          <input class="otp-box" maxlength="1" inputmode="numeric">
+          <input class="otp-box" maxlength="1" inputmode="numeric">
+          <input class="otp-box" maxlength="1" inputmode="numeric">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Verify &amp; Continue</button>
+      </form>
+      <div class="auth-links">
+        <button class="btn-text" id="resendBtn">Resend OTP</button>
+        <button class="btn-text" id="changeNumberBtn">Change number</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: role selection (new numbers only) -->
+    <div class="auth-step hidden" id="step-role">
+      <h2>Who are you?</h2>
+      <p class="text-secondary" style="margin-top:6px">This number isn't registered yet. Tell us how you'll use BuildSync.</p>
+      <div class="auth-form">
+        <button type="button" class="btn btn-ghost btn-block btn-lg role-choice-btn" data-role="builder" style="justify-content:flex-start;text-align:left;gap:14px;padding:16px 18px">
+          <span style="font-size:20px">🏢</span>
+          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
+            <strong>Builder</strong>
+            <span class="text-muted" style="font-size:12.5px;font-weight:400">I run the company — create projects &amp; add supervisors</span>
+          </span>
+        </button>
+        <button type="button" class="btn btn-ghost btn-block btn-lg role-choice-btn" data-role="supervisor" style="justify-content:flex-start;text-align:left;gap:14px;padding:16px 18px">
+          <span style="font-size:20px">👷</span>
+          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
+            <strong>Supervisor</strong>
+            <span class="text-muted" style="font-size:12.5px;font-weight:400">I run a site — manage labour &amp; attendance</span>
+          </span>
+        </button>
+        <button type="button" class="btn btn-ghost btn-block btn-lg role-choice-btn" data-role="worker" style="justify-content:flex-start;text-align:left;gap:14px;padding:16px 18px">
+          <span style="font-size:20px">🧱</span>
+          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
+            <strong>Labour</strong>
+            <span class="text-muted" style="font-size:12.5px;font-weight:400">I work on site — check in &amp; track my wages</span>
+          </span>
+        </button>
+      </div>
+      <div class="auth-links" style="justify-content:flex-start">
+        <button class="btn-text" id="backFromRoleBtn">‹ Back</button>
+      </div>
+    </div>
+
+    <!-- STEP 4a: new builder details -->
+    <div class="auth-step hidden" id="step-newbuilder">
+      <h2>Create your builder account</h2>
+      <p class="text-secondary" style="margin-top:6px">Set up your company to get started.</p>
+      <form id="newBuilderForm" class="auth-form">
+        <label class="field-label">Your name</label>
+        <input class="text-input" id="builderName" placeholder="e.g. Jaydev Lamror" required>
+        <label class="field-label">Company name</label>
+        <input class="text-input" id="builderCompany" placeholder="e.g. Lamror Constructions" required>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create account</button>
+      </form>
+      <div class="auth-links" style="justify-content:flex-start">
+        <button class="btn-text" id="backFromBuilderBtn">‹ Change role</button>
+      </div>
+    </div>
+
+    <!-- STEP 4b: new supervisor details -->
+    <div class="auth-step hidden" id="step-newsupervisor">
+      <h2>Create your supervisor account</h2>
+      <p class="text-secondary" style="margin-top:6px">A builder will assign you to a project once you're added.</p>
+      <form id="newSupervisorForm" class="auth-form">
+        <label class="field-label">Your name</label>
+        <input class="text-input" id="supervisorName" placeholder="e.g. Vansh Singh" required>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create account</button>
+      </form>
+      <div class="auth-links" style="justify-content:flex-start">
+        <button class="btn-text" id="backFromSupervisorBtn">‹ Change role</button>
+      </div>
+    </div>
+
+    <!-- STEP 4c: new labour details -->
+    <div class="auth-step hidden" id="step-newworker">
+      <h2>Create your labour account</h2>
+      <p class="text-secondary" style="margin-top:6px">A supervisor or builder will assign you to a project once you're added.</p>
+      <form id="newWorkerSelfForm" class="auth-form">
+        <label class="field-label">Your name</label>
+        <input class="text-input" id="workerSelfName" placeholder="e.g. Ramesh Kumar" required>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create account</button>
+      </form>
+      <div class="auth-links" style="justify-content:flex-start">
+        <button class="btn-text" id="backFromWorkerBtn">‹ Change role</button>
+      </div>
+    </div>
+
+    <!-- STEP: not found -->
+    <div class="auth-step hidden" id="step-notfound">
+      <h2>Number not recognised</h2>
+      <p class="text-secondary" style="margin-top:6px">
+        This number hasn't been added by a builder or supervisor yet. Ask them to add you, or create a new account.
+      </p>
+      <div class="auth-form">
+        <a href="login.html?intent=signup" class="btn btn-primary btn-block btn-lg">Create an account instead</a>
+        <button class="btn btn-ghost btn-block" id="tryAgainBtn" style="margin-top:12px">Try a different number</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="login.js"></script>
+</body>
+</html>
